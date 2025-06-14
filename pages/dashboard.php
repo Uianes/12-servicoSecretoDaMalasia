@@ -47,42 +47,102 @@ function formatAiText($text)
   <?php include '../includes/bootstrap_styles.php' ?>
   <link rel="stylesheet" href="../assets/css/bootstrap_custom.css">
   <title>Ker.AI - Dashboard</title>
+  <style>
+    .main-container {
+      display: flex;
+      border: 1px solid #ddd;
+      border-radius: 10px;
+      overflow: hidden;
+      height: 90vh;
+      max-width: 1200px;
+      margin: 0 auto;
+      box-shadow: 0 0 15px rgba(0, 0, 0, 0.1);
+    }
+
+    .content-area {
+      flex: 1;
+      overflow-y: auto;
+      padding: 20px;
+      font-size: 16px;
+    }
+
+    .sidebar {
+      width: 300px;
+      background-color: #fff;
+      border-left: 1px solid #ddd;
+      padding: 20px;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: flex-start;
+    }
+
+    .logo {
+      margin-bottom: 30px;
+      width: 160px;
+    }
+
+    .sidebar-button {
+      width: 100%;
+      margin-bottom: 15px;
+      padding: 10px 20px;
+      border-radius: 25px;
+      border: 1px solid #50629c;
+      background-color: #fff;
+      color: #50629c;
+      text-align: center;
+      text-decoration: none;
+      font-weight: 500;
+    }
+
+    .sidebar-button:hover {
+      background-color: #f0f2f8;
+    }
+
+    /* Scrollbar styling */
+    .content-area::-webkit-scrollbar {
+      width: 8px;
+    }
+
+    .content-area::-webkit-scrollbar-thumb {
+      background-color: #aaa;
+      border-radius: 10px;
+    }
+
+    .content-area::-webkit-scrollbar-track {
+      background-color: #f0f0f0;
+    }
+  </style>
 </head>
 
 <body class="bg-light">
-
   <?php render_toast(); ?>
 
-  <div class="container py-5">
-    <div class="mb-4">
-      <h2 class="mb-0">Resultados da Pesquisa</h2>
-    </div>
-
-    <div class="row g-4">
-      <div class="col-12">
-        <div class="card h-100 shadow-sm mb-4">
-          <div class="card-header bg-primary text-white">
-            <div class="d-flex justify-content-between align-items-center">
-              <h5 class="mb-0">Texto do Edital:</h5>
-            </div>
-          </div>
-          <div class="card-body">
-            <div class="ai-response">
-              <?php echo formatAiText($results); ?>
-            </div>
-          </div>
-          <div class="card-footer bg-white border-0">
-            <div class="d-flex justify-content-end">
-              <a class="btn btn-outline-primary btn-sm" href="../private/generate_doc.php">
-                <i class="bi bi-cloud-download"></i> Download
-              </a>
-            </div>
-          </div>
-        </div>
+  <div class="container py-4">
+    <div class="main-container">
+      <!-- Scrollable Content Area -->
+      <div class="content-area">
+        <?php
+        if (!empty($results)) {
+          echo formatAiText($results);
+        } else {
+          // Placeholder content to demonstrate scrolling
+          for ($i = 0; $i < 15; $i++) {
+            echo "<p>aqui vai o resultado da busca</p>";
+          }
+        }
+        ?>
       </div>
 
+      <!-- Static Sidebar -->
+      <div class="sidebar">
+        <img src="../assets/logo_ker.svg" alt="Ker.IA Logo" class="logo">
+
+        <a href="../private/price.php" class="sidebar-button">Pesquisar Preço Médio</a>
+        <a href="./first_search.php" class="sidebar-button">Voltar</a>
+        <a href="../private/generate_doc.php" class="sidebar-button">Download</a>
+      </div>
     </div>
-  
   </div>
 
   <?php require_once '../includes/bootstrap_script.php' ?>
