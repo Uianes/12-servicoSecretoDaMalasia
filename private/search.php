@@ -1,4 +1,5 @@
 <?php
+session_start();
 
 // --- CONFIGURAÇÃO DE SEGURANÇA (MUITO IMPORTANTE) ---
 // Em um ambiente de produção, JAMAIS coloque sua chave de API diretamente no código.
@@ -104,6 +105,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['user_prompt'])) {
 
         if ($generatedText) {
             echo "<h2>Modelo:</h2>";
+            $_SESSION['search_result'] = $generatedText;
             echo "<p>" . nl2br(htmlspecialchars($generatedText)) . "</p>";
         } else {
             echo "<p class='error-message'>Não foi possível obter uma resposta da Gemini 2.0 Flash. Por favor, tente novamente.</p>";
@@ -184,7 +186,12 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['user_prompt'])) {
 </head>
 <body>
     <div class="container">
+        <h1>Interação com a API Gemini 2.0 Flash via PHP</h1>
             <?php echo htmlspecialchars($_POST['user_prompt'] ?? ''); ?>
+            
+        <?php
+        // A lógica de exibição da resposta já está dentro do bloco POST acima
+        ?>
     </div>
 </body>
 </html>
