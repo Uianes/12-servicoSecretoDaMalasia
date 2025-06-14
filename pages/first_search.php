@@ -26,7 +26,7 @@ session_start();
           <h3>Pesquise sobre um item</h3>
         </div>
 
-        <form action="" method="post">
+        <form action="../private/search.php" method="post">
 
           <div class="form-floating">
             <textarea class="form-control" 
