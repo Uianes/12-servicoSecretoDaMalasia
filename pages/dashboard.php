@@ -73,25 +73,14 @@ function formatAiText($text)
           </div>
           <div class="card-footer bg-white border-0">
             <div class="d-flex justify-content-end">
-              <button class="btn btn-outline-primary btn-sm me-2">
+              <button class="btn btn-outline-primary btn-sm">
                 <i class="bi bi-cloud-download"></i> Download
-              </button>
-              <button class="btn btn-outline-danger btn-sm">
-                <i class="bi bi-trash"></i> Excluir
               </button>
             </div>
           </div>
         </div>
       </div>
 
-    </div>
-
-    <div class="row">
-      <div class="col-12 text-center">
-        <a href="/private/generate_doc.php" class="btn btn-primary">
-          Gerar Documento
-        </a>
-      </div>
     </div>
 
   </div>
