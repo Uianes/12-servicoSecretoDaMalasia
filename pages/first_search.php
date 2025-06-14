@@ -12,6 +12,7 @@ session_start();
   <?php include '../includes/bootstrap_styles.php' ?>
   <link rel="stylesheet" href="../assets/css/bootstrap_custom.css">
   <title>Ker.IA - Pesquisa</title>
+  <link rel="icon" type="image/x-icon" href="../assets/logo_ker.svg">
   <style>
     .search-button {
       top: 50%;
@@ -84,7 +85,7 @@ session_start();
           <li>Material de escritório e equipamentos de informática</li>
         </ul>
       </div>
-      
+
       <div class="mb-4">
         <h6 class="fw-bold">Como ser específico</h6>
         <p>Para melhores resultados, seja específico sobre o que você precisa. Inclua:</p>

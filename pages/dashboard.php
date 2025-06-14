@@ -47,6 +47,7 @@ function formatAiText($text)
   <?php include '../includes/bootstrap_styles.php' ?>
   <link rel="stylesheet" href="../assets/css/bootstrap_custom.css">
   <title>Ker.AI - Dashboard</title>
+  <link rel="icon" type="image/x-icon" href="../assets/logo_ker.svg">
   <style>
     .main-container {
       display: flex;
