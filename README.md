@@ -39,7 +39,3 @@ Mencione as ferramentas que você usou para criar seu projeto
 
 Você pode ver a lista de todos os [colaboradores](https://github.com/usuario/projeto/colaboradores) que participaram deste projeto.
 
-
-
----
-⌨️ com ❤️ por [Armstrong Lohãns](https://gist.github.com/lohhans) 😊
