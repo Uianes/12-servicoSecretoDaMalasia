@@ -98,12 +98,13 @@ function generateGeminiFlashContent(string $prompt): ?string
 
 // --- EXEMPLO DE USO EM UM FORMULÁRIO HTML SIMPLES ---
 if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['user_prompt'])) {
-    $userPrompt = "Gerar um Edital de Licitação completo (Pregão Eletrônico), incluindo o Termo de Referência detalhado, para a aquisição de um: ". trim($_POST['user_prompt']);
-
+    $userPrompt = "Gerar um Edital de Licitação completo (Pregão Eletrônico), incluindo o Termo de Referência detalhado, para a aquisição de um: " . trim($_POST['user_prompt']);
+    $_SESSION['user_prompt'] = $userPrompt; 
     if (!empty($userPrompt)) {
         $generatedText = generateGeminiFlashContent($userPrompt);
 
         if ($generatedText) {
+            $_SESSION['search_result'] = '';
             $_SESSION['search_result'] = $generatedText;
             header('Location: ../pages/dashboard.php');
             exit;
@@ -114,4 +115,3 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['user_prompt'])) {
         echo "<p class='error-message'>Por favor, digite um prompt válido.</p>";
     }
 }
-?>
