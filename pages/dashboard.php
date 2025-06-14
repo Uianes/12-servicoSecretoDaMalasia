@@ -73,16 +73,16 @@ function formatAiText($text)
           </div>
           <div class="card-footer bg-white border-0">
             <div class="d-flex justify-content-end">
-              <button class="btn btn-outline-primary btn-sm">
+              <a class="btn btn-outline-primary btn-sm" href="../private/generate_doc.php">
                 <i class="bi bi-cloud-download"></i> Download
-              </button>
+              </a>
             </div>
           </div>
         </div>
       </div>
 
     </div>
-
+  
   </div>
 
   <?php require_once '../includes/bootstrap_script.php' ?>

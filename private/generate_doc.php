@@ -1,85 +1,136 @@
 <?php
+session_start();
+require_once '../includes/toast.php';
 
+$result = $_SESSION['search_result'] ?? null;
+if (!$result) {
+  redirect_with_toast('./first_search.php', 'Nenhum resultado encontrado', 'warning');
+}
+
+// converter o html em docx com PHPWord
 require_once '../vendor/autoload.php';
 
-$autoloadPaths = [
-    __DIR__ . '/../../autoload.php',
-    getenv('HOME') . '/.composer/vendor/autoload.php'
-];
+use PhpOffice\PhpWord\PhpWord;
+use PhpOffice\PhpWord\IOFactory;
 
-foreach ($autoloadPaths as $path) {
-    if (file_exists($path)) {
-        require_once $path;
-        break;
+try {
+  // Criar novo documento PHPWord
+  $phpWord = new PhpWord();
+
+  // Adicionar seção
+  $section = $phpWord->addSection();
+
+  // Processar o conteúdo linha por linha
+  $lines = explode("\n", $result);
+
+  foreach ($lines as $line) {
+    $line = trim($line);
+
+    if (empty($line)) {
+      // Linha vazia - adicionar espaço
+      $section->addTextBreak();
+      continue;
     }
-}
 
-if (!class_exists('Parsedown')) {
-    die("Erro: Biblioteca Parsedown não encontrada. Execute 'composer require erusev/parsedown'");
-}
-
-if (isset($_POST['markdown'])) {
-    $markdown = trim($_POST['markdown']);
-    if (!empty($markdown)) {
-        generateCleanDoc($markdown);
+    // Headers
+    if (preg_match('/^### (.+)$/', $line, $matches)) {
+      $section->addTitle($matches[1], 3);
+    } elseif (preg_match('/^## (.+)$/', $line, $matches)) {
+      $section->addTitle($matches[1], 2);
+    } elseif (preg_match('/^# (.+)$/', $line, $matches)) {
+      $section->addTitle($matches[1], 1);
     }
-}
+    // Listas
+    elseif (preg_match('/^[\*\-\+] (.+)$/', $line, $matches)) {
+      $textRun = $section->addTextRun();
+      $textRun->addText('• ');
+      $textRun->addText(processInlineFormatting($matches[1]));
+    }
+    // Texto normal
+    else {
+      $textRun = $section->addTextRun();
+      addFormattedText($textRun, $line);
+    }
+  }
 
-function generateCleanDoc($markdown) {
-    $parsedown = new Parsedown();
-    $html = $parsedown->text($markdown);
-    
-    $rtf = <<<RTF
-{\\rtf1\\ansi\\ansicpg1252\\deff0\\nouicompat\\deflang1046
-{\\fonttbl{\\f0\\fnil\\fcharset0 Calibri;}}
-{\\colortbl ;\\red0\\green0\\blue0;}
-{\\*\\generator Markdown2Word 1.0}\\viewkind4\\uc1
-\\f0\\fs24\\lang1046
-RTF;
+  // Gerar nome do arquivo
+  $filename = 'documento_' . date('Y-m-d_H-i-s') . '.docx';
+  $temp_file = sys_get_temp_dir() . '/' . $filename;
 
-    // 3. Conversão segura para RTF
-    $rtf .= convertToSafeRtf($html);
-    $rtf .= "}";
+  // Salvar documento
+  $objWriter = IOFactory::createWriter($phpWord, 'Word2007');
+  $objWriter->save($temp_file);
 
-    // Enviar cabeçalhos
-    header('Content-Type: application/msword; charset=Windows-1252');
-    header('Content-Disposition: attachment; filename="documento.doc"');
-    header('Content-Length: ' . strlen($rtf));
-    echo $rtf;
+  // Fazer download do arquivo
+  if (file_exists($temp_file)) {
+    header('Content-Description: File Transfer');
+    header('Content-Type: application/vnd.openxmlformats-officedocument.wordprocessingml.document');
+    header('Content-Disposition: attachment; filename="' . $filename . '"');
+    header('Content-Transfer-Encoding: binary');
+    header('Expires: 0');
+    header('Cache-Control: must-revalidate');
+    header('Pragma: public');
+    header('Content-Length: ' . filesize($temp_file));
+
+    // Limpar buffer de saída
+    ob_clean();
+    flush();
+
+    // Enviar arquivo
+    readfile($temp_file);
+
+    // Remover arquivo temporário
+    unlink($temp_file);
     exit;
+  } else {
+    redirect_with_toast('./first_search.php', 'Erro ao gerar documento', 'error');
+  }
+} catch (Exception $e) {
+  error_log('Erro ao gerar documento: ' . $e->getMessage());
+  redirect_with_toast('../pages/first_search.php', 'Erro ao gerar documento: ' . $e->getMessage(), 'error');
 }
 
-function convertToSafeRtf($html) {
-    $html = strip_tags($html, '<h1><h2><h3><strong><b><em><i><u><ul><ol><li><p><br>');
-    
-    $replacements = [
+// Função para processar formatação inline
+function processInlineFormatting($text)
+{
+  // Remover formatação markdown para texto simples
+  $text = preg_replace('/\*\*(.*?)\*\*/', '$1', $text);
+  $text = preg_replace('/\*(.*?)\*/', '$1', $text);
+  $text = preg_replace('/`([^`]+)`/', '$1', $text);
+  $text = preg_replace('/\[([^\]]+)\]\([^)]+\)/', '$1', $text);
 
-        // Cabecalhos
-        '/<h1>(.*?)<\/h1>/i' => "\\fs36\\b $1\\b0\\fs24\\par\\par",
-        '/<h2>(.*?)<\/h2>/i' => "\\fs32\\b $1\\b0\\fs24\\par\\par",
-        '/<h3>(.*?)<\/h3>/i' => "\\fs28\\b $1\\b0\\fs24\\par\\par",
-        
-        '/<(strong|b)>(.*?)<\/(strong|b)>/i' => "\\b $2\\b0",
-        '/<(em|i)>(.*?)<\/(em|i)>/i' => "\\i $2\\i0",
-        '/<u>(.*?)<\/u>/i' => "\\ul $1\\ul0",
-        
-        '/<li>(.*?)<\/li>/i' => "\\bullet $1\\par",
-        '/<(ul|ol)>/i' => "",
-        '/<\/(ul|ol)>/i' => "\\par",
-        
-        '/<p>(.*?)<\/p>/i' => "$1\\par\\par",
-        '/<br\s?\/?>/i' => "\\par",
-    ];
-    
-    $rtf = preg_replace(array_keys($replacements), array_values($replacements), $html);
-    
-    $rtf = mb_convert_encoding($rtf, 'Windows-1252', 'UTF-8');
-    
-    $rtf = str_replace(
-        ["\\", "{", "}", "«", "»", "“", "”"],
-        ["\\\\", "\\{", "\\}", "\\'ab", "\\'bb", "\\'93", "\\'94"],
-        $rtf
-    );
-    
-    return $rtf;
+  return $text;
+}
+
+// Função para adicionar texto formatado
+function addFormattedText($textRun, $text)
+{
+  // Processar bold
+  $parts = preg_split('/(\*\*.*?\*\*)/', $text, -1, PREG_SPLIT_DELIM_CAPTURE);
+
+  foreach ($parts as $part) {
+    if (preg_match('/\*\*(.*?)\*\*/', $part, $matches)) {
+      $textRun->addText($matches[1], ['bold' => true]);
+    } elseif (!empty($part)) {
+      // Processar italic
+      $italicParts = preg_split('/(\*.*?\*)/', $part, -1, PREG_SPLIT_DELIM_CAPTURE);
+
+      foreach ($italicParts as $italicPart) {
+        if (preg_match('/\*(.*?)\*/', $italicPart, $italicMatches)) {
+          $textRun->addText($italicMatches[1], ['italic' => true]);
+        } elseif (!empty($italicPart)) {
+          // Processar código
+          $codeParts = preg_split('/(`[^`]+`)/', $italicPart, -1, PREG_SPLIT_DELIM_CAPTURE);
+
+          foreach ($codeParts as $codePart) {
+            if (preg_match('/`([^`]+)`/', $codePart, $codeMatches)) {
+              $textRun->addText($codeMatches[1], ['name' => 'Courier New']);
+            } elseif (!empty($codePart)) {
+              $textRun->addText($codePart);
+            }
+          }
+        }
+      }
+    }
+  }
 }
