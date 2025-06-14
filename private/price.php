@@ -1,5 +1,6 @@
 <?php
 session_start();
+require_once '../vendor/autoload.php'; // For TCPDF
 
 define('GEMINI_API_KEY', 'AIzaSyBtK_pWJTHqgGew6tDf2iuKeIJ3E0chYWQ');
 define('GEMINI_API_URL', 'https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash:generateContent?key=' . GEMINI_API_KEY);
@@ -43,62 +44,135 @@ function generateGeminiFlashContent(string $prompt): ?string
     return null;
 }
 
-// --- PROCESSAMENTO DO FORMULÁRIO ---
-if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['produto'])) {
-    $produto = trim($_POST['produto']);
-    $prompt = "Seja muito direto em sua resposta e de preferência use somente a tabela como resultado. Pesquise o preço médio praticado em licitações públicas brasileiras para o produto: $produto. 
-               Cite fontes ou valores estimados usados em editais.";
-
-    $resposta = generateGeminiFlashContent($prompt);
-    $_SESSION['produto'] = $produto;
-    $_SESSION['resposta'] = $resposta;
-    header('Location: ' . $_SERVER['PHP_SELF']);
-    exit;
+/**
+ * Convert Markdown to HTML
+ */
+function markdownToHtml($text) {
+    // Process headers
+    $text = preg_replace('/^### (.*?)$/m', '<h3>$1</h3>', $text);
+    $text = preg_replace('/^## (.*?)$/m', '<h2>$1</h2>', $text);
+    $text = preg_replace('/^# (.*?)$/m', '<h1>$1</h1>', $text);
+    
+    // Process bold and italic
+    $text = preg_replace('/\*\*(.*?)\*\*/m', '<strong>$1</strong>', $text);
+    $text = preg_replace('/\*(.*?)\*/m', '<em>$1</em>', $text);
+    
+    // Process bullet lists
+    $text = preg_replace('/^- (.*?)$/m', '• $1<br>', $text);
+    $text = preg_replace('/^\* (.*?)$/m', '• $1<br>', $text);
+    $text = preg_replace('/^\+ (.*?)$/m', '• $1<br>', $text);
+    
+    // Convert markdown tables to HTML tables
+    if (preg_match_all('/^\|(.+)\|$/m', $text, $tableRows)) {
+        foreach ($tableRows[0] as $row) {
+            $cells = explode('|', trim($row, '|'));
+            $htmlRow = '<tr>';
+            foreach ($cells as $cell) {
+                $htmlRow .= '<td>' . trim($cell) . '</td>';
+            }
+            $htmlRow .= '</tr>';
+            
+            // Replace the original Markdown table row with HTML
+            $text = str_replace($row, $htmlRow, $text);
+        }
+        
+        // Find consecutive <tr> elements and wrap them in a table
+        $text = preg_replace('/(<tr>.+?<\/tr>)(\s*)(<tr>.+?<\/tr>)/s', '<table border="1" cellpadding="5">$1$3</table>', $text);
+        
+        // Replace separator rows (|----|----|----|) with nothing
+        $text = preg_replace('/<tr><td>[\s\-:]+<\/td><\/tr>/', '', $text);
+    }
+    
+    // Convert line breaks
+    $text = nl2br($text);
+    
+    return $text;
 }
+
+// Check if user prompt exists in session
+if (!isset($_SESSION['user_prompt']) || empty($_SESSION['user_prompt'])) {
+    die("Erro: Nenhuma consulta encontrada na sessão.");
+}
+
+// Retrieve query from session
+$produto = $_SESSION['user_prompt'];
+$prompt = "Seja muito direto em sua resposta e apresente os dados de forma estruturada. Pesquise o preço médio praticado em licitações públicas brasileiras para o produto: $produto. 
+           Cite fontes ou valores estimados usados em editais. Inclua preço unitário, quantidade típica e valor total quando disponível. Formate a resposta usando listas e tabelas simples em markdown para facilitar a leitura.";
+
+// Get response from Gemini API
+$resposta = generateGeminiFlashContent($prompt);
+
+if (!$resposta) {
+    die("Erro ao obter resposta da API.");
+}
+
+// Generate PDF using TCPDF
+require_once('../vendor/tecnickcom/tcpdf/tcpdf.php');
+
+// Create new PDF document
+$pdf = new TCPDF(PDF_PAGE_ORIENTATION, PDF_UNIT, PDF_PAGE_FORMAT, true, 'UTF-8', false);
+
+// Set document information
+$pdf->SetCreator('Sistema de Consulta de Preços');
+$pdf->SetAuthor('Sistema Automático');
+$pdf->SetTitle('Pesquisa de Preço: ' . $produto);
+$pdf->SetSubject('Pesquisa de Preço em Licitações');
+$pdf->SetKeywords('licitação, preço médio, ' . $produto);
+
+// Set default header data
+$pdf->SetHeaderData('', 0, 'Pesquisa de Preço em Licitações', 'Data: ' . date('d/m/Y'));
+
+// Set header and footer fonts
+$pdf->setHeaderFont(Array('helvetica', '', 10));
+$pdf->setFooterFont(Array('helvetica', '', 8));
+
+// Set default monospaced font
+$pdf->SetDefaultMonospacedFont('courier');
+
+// Set margins
+$pdf->SetMargins(15, 25, 15);
+$pdf->SetHeaderMargin(5);
+$pdf->SetFooterMargin(10);
+
+// Set auto page breaks
+$pdf->SetAutoPageBreak(TRUE, 25);
+
+// Set image scale factor
+$pdf->setImageScale(1.25);
+
+// Add a page
+$pdf->AddPage();
+
+// Set font
+$pdf->SetFont('helvetica', 'B', 16);
+
+// Title
+$pdf->Cell(0, 10, 'Relatório de Preços em Licitações', 0, 1, 'C');
+$pdf->SetFont('helvetica', 'B', 14);
+$pdf->Cell(0, 10, 'Produto/Serviço: ' . $produto, 0, 1, 'C');
+$pdf->Ln(10);
+
+// Content
+$pdf->SetFont('helvetica', '', 11);
+$pdf->writeHTML('<h2>Resultados da pesquisa</h2>', true, false, true, false, '');
+
+// Format the response: convert Markdown to HTML
+$html = '<div style="line-height: 1.5;">' . markdownToHtml($resposta) . '</div>';
+
+// Write the HTML content
+$pdf->writeHTML($html, true, false, true, false, '');
+
+// Add notes
+$pdf->Ln(10);
+$pdf->SetFont('helvetica', 'I', 10);
+$pdf->Write(0, 'Nota: Os preços apresentados são baseados em pesquisa automática e devem ser verificados antes de qualquer decisão de compra.', '', false, 'L', true);
+$pdf->Write(0, 'Documento gerado automaticamente em ' . date('d/m/Y H:i:s'), '', false, 'L', true);
+
+// Generate filename
+$filename = 'pesquisa_preco_' . preg_replace('/[^a-zA-Z0-9_]/', '_', $produto) . '_' . date('Y-m-d') . '.pdf';
+
+// Close and output PDF document
+$pdf->Output($filename, 'D'); // 'D' means download
+
+exit;
 ?>
-
-<!-- FORMULÁRIO HTML E RESULTADO -->
-<!DOCTYPE html>
-<html lang="pt-br">
-<head>
-    <meta charset="UTF-8">
-    <title>Consulta de Preço em Licitações com Gemini</title>
-    <style>
-        body { font-family: Arial, sans-serif; margin: 40px; }
-        input[type=text] { width: 300px; padding: 8px; }
-        input[type=submit] { padding: 8px 16px; }
-        table { border-collapse: collapse; width: 100%; margin-top: 30px; }
-        th, td { border: 1px solid #ccc; padding: 10px; }
-        th { background: #eee; }
-    </style>
-</head>
-<body>
-    <h1>Consulta de Preço Médio em Licitações</h1>
-
-    <form method="POST">
-        <label for="produto">Produto ou serviço:</label><br>
-        <input type="text" name="produto" id="produto" required>
-        <input type="submit" value="Consultar preço médio">
-    </form>
-
-    <?php if (!empty($_SESSION['resposta'])): ?>
-        <h2>Resultado para: <?= htmlspecialchars($_SESSION['produto']) ?></h2>
-
-        <table>
-            <tr>
-                <th>Produto</th>
-                <th>Preços praticados</th>
-            </tr>
-            <tr>
-                <td><?= htmlspecialchars($_SESSION['produto']) ?></td>
-                <td><?= nl2br(htmlspecialchars($_SESSION['resposta'])) ?></td>
-            </tr>
-        </table>
-
-        <?php
-        // Limpa a sessão após exibir
-        unset($_SESSION['produto'], $_SESSION['resposta']);
-        ?>
-    <?php endif; ?>
-</body>
-</html>
