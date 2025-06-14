@@ -11,7 +11,7 @@ session_start();
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <?php include '../includes/bootstrap_styles.php' ?>
   <link rel="stylesheet" href="../assets/css/bootstrap_custom.css">
-  <title> - Pesquisa</title>
+  <title>Ker.AI - Pesquisa</title>
 </head>
 
 <body class="bg-light">
