@@ -29,13 +29,13 @@ session_start();
         <form action="../private/search.php" method="post">
 
           <div class="form-floating">
-            <textarea class="form-control" 
-                oninput="this.style.height = 'auto'; this.style.height = this.scrollHeight + 'px';"
-                style="overflow: hidden; resize: none; min-height: 120px;" 
-                placeholder="Pesquise sobre um item" 
-                name="user_prompt" 
-                id="input_pesquisa" 
-                required></textarea>
+            <textarea class="form-control"
+              oninput="this.style.height = 'auto'; this.style.height = this.scrollHeight + 'px';"
+              style="overflow: hidden; resize: none; min-height: 120px;"
+              placeholder="Pesquise sobre um item"
+              name="user_prompt"
+              id="input_pesquisa"
+              required></textarea>
             <label for="input_pesquisa">Pesquise sobre um item</label>
           </div>
 
@@ -50,9 +50,12 @@ session_start();
   </div>
 
 
-
-  <?php require_once '../includes/bootstrap_script.php' ?>
+  <?php
+  require_once '../includes/bootstrap_script.php';
+  require_once '../includes/spinner.php';
+  ?>
   <script src="../assets/js/toast.js"></script>
+  <script src="../assets/js/spinner.js"></script>
 
 </body>
 
