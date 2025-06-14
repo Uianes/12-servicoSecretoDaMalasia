@@ -34,9 +34,9 @@ session_start();
                 style="overflow: hidden; resize: none; min-height: 120px;" 
                 placeholder="Pesquise sobre um item" 
                 name="user_prompt" 
-                id="user_prompt" 
+                id="input_pesquisa" 
                 required></textarea>
-            <label for="user_prompt">Pesquise sobre um item</label>
+            <label for="input_pesquisa">Pesquise sobre um item</label>
           </div>
 
           <div class="mt-3">
