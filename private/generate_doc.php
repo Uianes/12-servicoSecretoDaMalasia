@@ -2,6 +2,11 @@
 session_start();
 require_once '../includes/toast.php';
 
+if (!isset($_SESSION['logged_in']) || $_SESSION['logged_in'] !== true) {
+  session_unset();
+  redirect_with_toast('../index.php', "Você não está logado. Faça login para acessar esta página.");
+}
+
 $result = $_SESSION['search_result'] ?? null;
 if (!$result) {
   redirect_with_toast('./first_search.php', 'Nenhum resultado encontrado', 'warning');

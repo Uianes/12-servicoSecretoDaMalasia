@@ -2,6 +2,11 @@
 session_start();
 require_once '../vendor/autoload.php'; // For TCPDF
 
+if (!isset($_SESSION['logged_in']) || $_SESSION['logged_in'] !== true) {
+  session_unset();
+  redirect_with_toast('../index.php', "Você não está logado. Faça login para acessar esta página.");
+}
+
 define('GEMINI_API_KEY', 'AIzaSyBtK_pWJTHqgGew6tDf2iuKeIJ3E0chYWQ');
 define('GEMINI_API_URL', 'https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash:generateContent?key=' . GEMINI_API_KEY);
 

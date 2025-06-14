@@ -1,6 +1,11 @@
 <?php
 session_start();
 
+if (!isset($_SESSION['logged_in']) || $_SESSION['logged_in'] !== true) {
+  session_unset();
+  redirect_with_toast('../index.php', "Você não está logado. Faça login para acessar esta página.");
+}
+
 // --- CONFIGURAÇÃO DE SEGURANÇA (MUITO IMPORTANTE) ---
 // Em um ambiente de produção, JAMAIS coloque sua chave de API diretamente no código.
 // Use variáveis de ambiente (getenv('GEMINI_API_KEY')) ou um arquivo de configuração seguro

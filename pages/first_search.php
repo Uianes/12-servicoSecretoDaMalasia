@@ -4,7 +4,7 @@ session_start();
 
 if (!isset($_SESSION['logged_in']) || $_SESSION['logged_in'] !== true) {
   session_unset();
-  redirect_with_toast('../index.php', "Você não está logado. Faça login para deletar a conta.");
+  redirect_with_toast('../index.php', "Você não está logado. Faça login para acessar esta página.");
 }
 
 ?>
