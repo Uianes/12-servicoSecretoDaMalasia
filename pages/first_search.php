@@ -13,10 +13,10 @@ session_start();
   <link rel="stylesheet" href="../assets/css/bootstrap_custom.css">
   <title>Ker.IA - Pesquisa</title>
   <style>
-    /* Just the minimal custom CSS we can't easily do with Bootstrap */
     .search-button {
-      right: 5px;
-      top: 5px;
+      top: 50%;
+      right: 8px;
+      transform: translateY(-50%);
     }
   </style>
 </head>
