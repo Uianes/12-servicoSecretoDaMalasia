@@ -98,7 +98,7 @@ function generateGeminiFlashContent(string $prompt): ?string
 
 // --- EXEMPLO DE USO EM UM FORMULÁRIO HTML SIMPLES ---
 if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['user_prompt'])) {
-    $userPrompt = "Gerar um Edital de Licitação completo (Pregão Eletrônico), incluindo o Termo de Referência detalhado, para a aquisição de um: " . trim($_POST['user_prompt']);
+    $userPrompt = "Gerar um Edital de Licitação completo (Pregão Eletrônico), incluindo o Termo de Referência detalhado, para a aquisição de: " . trim($_POST['user_prompt']) . ". Considere as informações sobre o usuário que está solicitando os dados: Email: " . $_SESSION['user_email'] . ", Nome: " . $_SESSION['user_nome'] . ", Cargo: " . $_SESSION['user_cargo'] . ", Secretaria: " . $_SESSION['user_secretaria']  ;
     $_SESSION['user_prompt'] = $_POST['user_prompt']; 
     if (!empty($userPrompt)) {
         $generatedText = generateGeminiFlashContent($userPrompt);

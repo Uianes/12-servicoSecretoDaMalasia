@@ -3,7 +3,7 @@ function open_connection() {
     $host = 'localhost';
     $username = 'root';
     $password = '';
-    $database = 'coderace25';
+    $database = 'keria';
     
     // Cria conexão
     $connection = mysqli_connect($host, $username, $password, $database);

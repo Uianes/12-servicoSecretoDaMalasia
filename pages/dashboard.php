@@ -119,6 +119,12 @@ function formatAiText($text)
 <body class="bg-light">
   <?php render_toast(); ?>
 
+  <div class="position-fixed top-0 end-0 p-3">
+    <a href="../actions/logout.php" class="btn btn-sm btn-outline-danger">
+      <i class="bi bi-box-arrow-right"></i> Sair
+    </a>
+  </div>
+
   <div class="container py-4">
     <div class="main-container">
       <!-- Scrollable Content Area -->

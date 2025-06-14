@@ -1,6 +1,12 @@
 <?php
 require_once '../includes/toast.php';
 session_start();
+
+if (!isset($_SESSION['logged_in']) || $_SESSION['logged_in'] !== true) {
+  session_unset();
+  redirect_with_toast('../index.php', "Você não está logado. Faça login para deletar a conta.");
+}
+
 ?>
 
 <!doctype html>
@@ -25,6 +31,12 @@ session_start();
 <body class="bg-light">
   <?php render_toast(); ?>
 
+  <div class="position-fixed top-0 end-0 p-3">
+    <a href="../actions/logout.php" class="btn btn-sm btn-outline-danger">
+      <i class="bi bi-box-arrow-right"></i> Sair
+    </a>
+  </div>
+
   <div class="container min-vh-100 d-flex flex-column justify-content-center">
     <div class="row mb-5">
       <div class="col-12 text-center">
@@ -38,10 +50,10 @@ session_start();
           <form action="../private/search.php" method="post" class="position-relative">
             <input type="text" class="form-control form-control-lg border border-2 rounded-pill py-3 ps-4 pe-5"
               name="user_prompt" id="input_pesquisa" placeholder="Qual Produto Deseja Licitar?"
-              style="border-color: #3f51b5 !important;" required>
+              style="border-color: #292871 !important;" required>
             <button type="submit"
               class="btn position-absolute search-button rounded-circle d-flex justify-content-center align-items-center"
-              style="width: 50px; height: 50px; background-color: #3f51b5;">
+              style="width: 50px; height: 50px; background-color: #292871;">
               <i class="bi bi-search text-white"></i>
             </button>
           </form>
