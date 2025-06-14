@@ -104,94 +104,14 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['user_prompt'])) {
         $generatedText = generateGeminiFlashContent($userPrompt);
 
         if ($generatedText) {
-            echo "<h2>Modelo:</h2>";
             $_SESSION['search_result'] = $generatedText;
-            echo "<p>" . nl2br(htmlspecialchars($generatedText)) . "</p>";
+            header('Location: ../pages/dashboard.php');
+            exit;
         } else {
             echo "<p class='error-message'>Não foi possível obter uma resposta da Gemini 2.0 Flash. Por favor, tente novamente.</p>";
-            // Em ambiente de desenvolvimento, você pode adicionar mais detalhes para depuração:
-            // echo "<p class='error-message'>Verifique os logs do servidor para mais informações.</p>";
         }
     } else {
         echo "<p class='error-message'>Por favor, digite um prompt válido.</p>";
     }
 }
 ?>
-
-<!DOCTYPE html>
-<html lang="pt-BR">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Integração Gemini 2.0 Flash com PHP (cURL)</title>
-    <style>
-        body { font-family: Arial, sans-serif; margin: 20px; background-color: #f8f9fa; color: #343a40; }
-        .container { max-width: 800px; margin: 20px auto; background-color: #ffffff; padding: 30px; border-radius: 10px; box-shadow: 0 4px 12px rgba(0,0,0,0.08); }
-        h1, h2 { color: #007bff; text-align: center; margin-bottom: 25px; }
-        form { margin-bottom: 30px; }
-        label { display: block; margin-bottom: 8px; font-weight: bold; color: #495057; }
-        textarea {
-            width: calc(100% - 24px); /* Ajusta para padding e border */
-            height: 150px;
-            margin-bottom: 15px;
-            padding: 12px;
-            border: 1px solid #ced4da;
-            border-radius: 6px;
-            font-size: 1rem;
-            resize: vertical;
-            transition: border-color 0.2s ease-in-out, box-shadow 0.2s ease-in-out;
-        }
-        textarea:focus {
-            border-color: #80bdff;
-            outline: 0;
-            box-shadow: 0 0 0 0.2rem rgba(0,123,255,.25);
-        }
-        input[type="submit"] {
-            display: block;
-            width: 100%;
-            padding: 12px 25px;
-            background-color: #6f42c1; /* Cor para Gemini 2.0 Flash */
-            color: white;
-            border: none;
-            border-radius: 6px;
-            cursor: pointer;
-            font-size: 1.1rem;
-            font-weight: bold;
-            transition: background-color 0.3s ease;
-        }
-        input[type="submit"]:hover {
-            background-color: #59359a;
-        }
-        p {
-            background-color: #e9f7ef;
-            padding: 20px;
-            border: 1px solid #d4edda;
-            border-radius: 8px;
-            margin-top: 25px;
-            word-wrap: break-word;
-            line-height: 1.6;
-            color: #155724;
-        }
-        .error-message {
-            color: #dc3545;
-            background-color: #f8d7da;
-            border-color: #f5c6cb;
-            padding: 15px;
-            border-radius: 8px;
-            margin-top: 20px;
-            text-align: center;
-            font-weight: bold;
-        }
-    </style>
-</head>
-<body>
-    <div class="container">
-        <h1>Interação com a API Gemini 2.0 Flash via PHP</h1>
-            <?php echo htmlspecialchars($_POST['user_prompt'] ?? ''); ?>
-            
-        <?php
-        // A lógica de exibição da resposta já está dentro do bloco POST acima
-        ?>
-    </div>
-</body>
-</html>

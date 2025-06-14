@@ -59,38 +59,38 @@ function formatAiText($text)
     </div>
 
     <div class="row g-4">
-      <?php foreach ($results as $item): ?>
-        <div class="col-12">
-          <div class="card h-100 shadow-sm mb-4">
-            <div class="card-header bg-primary text-white">
-              <div class="d-flex justify-content-between align-items-center">
-                <h5 class="mb-0">Item: <span class="query-text">"<?php echo htmlspecialchars($item['item']); ?>"</span></h5>
-              </div>
+      <div class="col-12">
+        <div class="card h-100 shadow-sm mb-4">
+          <div class="card-header bg-primary text-white">
+            <div class="d-flex justify-content-between align-items-center">
+              <h5 class="mb-0">Texto do Edital:</h5>
             </div>
-            <div class="card-body">
-              <div class="ai-response">
-                <?php echo formatAiText($item['response']); ?>
-              </div>
+          </div>
+          <div class="card-body">
+            <div class="ai-response">
+              <?php echo formatAiText($results); ?>
             </div>
-            <div class="card-footer bg-white border-0">
-              <div class="d-flex justify-content-end">
-                <button class="btn btn-outline-primary btn-sm me-2">
-                  <i class="bi bi-cloud-download"></i> Download
-                </button>
-                <button class="btn btn-outline-danger btn-sm">
-                  <i class="bi bi-trash"></i> Excluir
-                </button>
-              </div>
+          </div>
+          <div class="card-footer bg-white border-0">
+            <div class="d-flex justify-content-end">
+              <button class="btn btn-outline-primary btn-sm me-2">
+                <i class="bi bi-cloud-download"></i> Download
+              </button>
+              <button class="btn btn-outline-danger btn-sm">
+                <i class="bi bi-trash"></i> Excluir
+              </button>
             </div>
           </div>
         </div>
-      <?php endforeach; ?>
+      </div>
 
-      <!-- Baixar -->
-      <div class="col-12 mt-3 text-center">
-        <button type="button" class="btn btn-primary btn-lg">
-          <i class="bi bi-cloud-download"></i> Baixar Todos os Resultados
-        </button>
+    </div>
+
+    <div class="row">
+      <div class="col-12 text-center">
+        <a href="/private/generate_doc.php" class="btn btn-primary">
+          Gerar Documento
+        </a>
       </div>
     </div>
 
