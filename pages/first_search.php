@@ -1,6 +1,5 @@
 <?php
 require_once '../includes/toast.php';
-require_once '../private/db_connection.php';
 session_start();
 ?>
 
