@@ -33,10 +33,10 @@ session_start();
                 oninput="this.style.height = 'auto'; this.style.height = this.scrollHeight + 'px';"
                 style="overflow: hidden; resize: none; min-height: 120px;" 
                 placeholder="Pesquise sobre um item" 
-                name="input_pesquisa" 
-                id="input_pesquisa" 
+                name="user_prompt" 
+                id="user_prompt" 
                 required></textarea>
-            <label for="input_pesquisa">Pesquise sobre um item</label>
+            <label for="user_prompt">Pesquise sobre um item</label>
           </div>
 
           <div class="mt-3">
