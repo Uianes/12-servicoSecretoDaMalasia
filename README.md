@@ -37,5 +37,12 @@ Mencione as ferramentas que você usou para criar seu projeto
 
 ## ✒️ Autores
 
-Você pode ver a lista de todos os [colaboradores](https://github.com/usuario/projeto/colaboradores) que participaram deste projeto.
+@ArthurWillers - Arthur Willers
+
+@Davi-WT - Davi Trentini
+
+@edinholegal - Edson Mosselin
+
+@janSitto - João Vitor Schmitt
+
 
