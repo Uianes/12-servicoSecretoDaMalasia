@@ -1,2 +1,2 @@
 <?php
-header('Location: ./pages/first_search.php');
+header('Location: ./pages/login.php');
